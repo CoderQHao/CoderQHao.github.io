@@ -209,6 +209,13 @@
 
               <time title="创建时间：2019-04-11 14:18:39" itemprop="dateCreated datePublished" datetime="2019-04-11T14:18:39+08:00">2019-04-11</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-01-03 14:59:15" itemprop="dateModified" datetime="2020-01-03T14:59:15+08:00">2020-01-03</time>
+              </span>
 
           
 
@@ -222,200 +229,166 @@
 
       
           <blockquote>
-<p>对于苹果开发者而言，LLDB 是无人不知的调试工具，然而此知非彼知，相信有相当规模的开发者对 LLDB 的了解仍然停留于几个基础命令的使用，今天让我们来重新认识一下既熟悉又陌生的 LLDB，看看它那些你不曾用过的强大功能，以及如何提高我们的开发效率。</p>
+<p>对于苹果开发者而言，<code>LLDB</code>是无人不知的调试工具，然而此知非彼知，相信有相当规模的开发者对 <code>LLDB</code> 的了解仍然停留于几个基础命令的使用，今天让我们来重新认识一下既熟悉又陌生的 <code>LLDB</code>，看看它那些你不曾用过的强大功能，以及如何提高我们的开发效率。</p>
 </blockquote>
 <h3 id="一、什么叫动态调试"><a href="#一、什么叫动态调试" class="headerlink" title="一、什么叫动态调试"></a>一、什么叫动态调试</h3><blockquote>
 <p>将程序运行起来，通过下断点、打印等⽅方式，查看参数、返回值、函数调⽤用流程等</p>
 </blockquote>
-<h3 id="二、Xcode的动态调试原理"><a href="#二、Xcode的动态调试原理" class="headerlink" title="二、Xcode的动态调试原理"></a>二、Xcode的动态调试原理</h3><p><img src="https://note.youdao.com/yws/api/personal/file/WEB16d80f18b31792481b7bf6c453c3a123?method=download&shareKey=a2b54536e8d0c73eb80f7a82e246f3f0" alt=""></p>
+<h3 id="二、Xcode-的动态调试原理"><a href="#二、Xcode-的动态调试原理" class="headerlink" title="二、Xcode 的动态调试原理"></a>二、Xcode 的动态调试原理</h3><p><img src="../images/%E5%8A%A8%E6%80%81%E8%B0%83%E8%AF%95%E7%9A%84%E9%82%A3%E4%BA%9B%E4%BA%8B%E5%84%BF/%E5%8A%A8%E6%80%81%E8%B0%83%E8%AF%95%E5%8E%9F%E7%90%86.png" alt="动态调试原理"></p>
 <ul>
-<li>关于GCC、LLVM、GDB、LLDB<ul>
-<li>Xcode的<strong>编译器</strong>发展历程：<a href="https://www.gnu.org/software/gcc/" target="_blank" rel="noopener">GCC</a> → <a href="https://llvm.org/" target="_blank" rel="noopener">LLVM</a></li>
-<li>Xcode的<strong>调试器</strong>发展历程：<a href="https://www.gnu.org/software/gdb/" target="_blank" rel="noopener">GDB</a> → <a href="https://lldb.llvm.org/" target="_blank" rel="noopener">LLDB</a> </li>
+<li><p>关于 <strong>GCC、LLVM、GDB、LLDB</strong></p>
+<ul>
+<li>Xcode 的 <code>编译器</code> 发展历程：<a href="https://www.gnu.org/software/gcc/" target="_blank" rel="noopener">GCC</a> → <a href="https://llvm.org/" target="_blank" rel="noopener">LLVM</a></li>
+<li>Xcode 的 <code>调试器</code> 发展历程：<a href="https://www.gnu.org/software/gdb/" target="_blank" rel="noopener">GDB</a> → <a href="https://lldb.llvm.org/" target="_blank" rel="noopener">LLDB</a> </li>
 </ul>
 </li>
-<li>debugserver一开始存放在Mac的Xcode⾥面<ul>
-<li><strong>/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/DeviceSupport/9.1/DeveloperDiskImage.dmg/usr/bin/debugserver</strong></li>
+<li><p>debugserver一开始存放在Mac的Xcode⾥面</p>
+  <figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/DeviceSupport/<span class="number">9.1</span>/DeveloperDiskImage.dmg/usr/bin/debugserver</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>当Xcode识别到手机设备时，Xcode会自动将debugserver安装到iPhone上 </p>
+  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;Developer&#x2F;usr&#x2F;bin&#x2F;debugserver</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>Xcode调试的局限性   </p>
+<ul>
+<li>一般情况下,只能调试通过 Xcode 安装的 App</li>
 </ul>
 </li>
-<li>当Xcode识别到手机设备时，Xcode会自动将debugserver安装到iPhone上 <ul>
-<li><strong>/Developer/usr/bin/debugserver</strong></li>
 </ul>
-</li>
-<li>Xcode调试的局限性   <ul>
-<li>一般情况下,只能调试通过Xcode安装的App</li>
-</ul>
-</li>
-</ul>
-<h3 id="三、动态调试任意App"><a href="#三、动态调试任意App" class="headerlink" title="三、动态调试任意App"></a>三、动态调试任意App</h3><p><img src="https://note.youdao.com/yws/api/personal/file/WEBc09492c2b202fa57ee80abc19e3b02ae?method=download&shareKey=e887f6f8b08917dc0600ff5371a0c9ae" alt=""></p>
-<h4 id="debugserver的权限问题"><a href="#debugserver的权限问题" class="headerlink" title="debugserver的权限问题"></a>debugserver的权限问题</h4><ul>
-<li>默认情况下，/Developer/usr/bin/debugserver缺少一定的权限，只能调试通过Xcode安装的APP，⽆无法调试其他App(⽐比如来⾃自App Store的App) </li>
-<li>如果希望调试其他App，需要对debugserver重新签名，签上2个调试相关的权限<ul>
+<h3 id="三、动态调试任意-App"><a href="#三、动态调试任意-App" class="headerlink" title="三、动态调试任意 App"></a>三、动态调试任意 App</h3><p><img src="../images/%E5%8A%A8%E6%80%81%E8%B0%83%E8%AF%95%E7%9A%84%E9%82%A3%E4%BA%9B%E4%BA%8B%E5%84%BF/%E5%8A%A8%E6%80%81%E8%B0%83%E8%AF%95%E4%BB%BB%E6%84%8FApp.png" alt="动态调试任意App"></p>
+<p><strong>1、debugserver 的权限问题</strong></p>
+<ul>
+<li>默认情况下，<code>/Developer/usr/bin/debugserver</code> 缺少一定的权限，只能调试通过 Xcode 安装的 APP，无法调试其他 App (⽐如来⾃自 App Store 的 App) </li>
+<li>如果希望调试其他App，需要对 <code>debugserver</code> 重新签名，签上<strong>2</strong>个调试相关的权限<ul>
 <li>get-task-allow</li>
-<li>task_for_pid-allow<h4 id="如何给debugserver签上权限"><a href="#如何给debugserver签上权限" class="headerlink" title="如何给debugserver签上权限"></a>如何给debugserver签上权限</h4></li>
+<li>task_for_pid-allow</li>
 </ul>
 </li>
-<li>iPhone上的/Developer⽬目录是只读的，无法直接对/Developer/usr/bin/debugserver⽂件签名，需要先把<code>debugserver</code>复制到 Mac 上</li>
-<li>通过<code>ldid</code>命令导出⽂件以前的签名权限<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ldid -e debugserver &gt; debugserver.entitlements</span><br></pre></td></tr></table></figure></li>
-<li>给 debugserver.plist 文件加上 <code>get-task-allow</code> 和 <code>task_for_pid-allow</code> 权限<br><img src="https://note.youdao.com/yws/api/personal/file/WEBecde1996182959964c2ace298672b033?method=download&shareKey=d51cc6d1f6a358cf41c3fe514d940352" alt=""></li>
+</ul>
+<p><strong>2、如何给 debugserver 签上权限</strong></p>
+<ul>
+<li>iPhone上的 <code>/Developer</code> ⽬录是只读的，无法直接对 <code>/Developer/usr/bin/debugserver</code> ⽂件签名，需要先把 <code>debugserver</code> 复制到 Mac 上</li>
+<li>通过 <code>ldid</code> 命令导出⽂件以前的签名权限<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ldid -e debugserver &gt; debugserver.entitlements</span><br></pre></td></tr></table></figure></li>
+<li>给 <strong>debugserver.plist</strong> 文件加上 <code>get-task-allow</code> 和 <code>task_for_pid-allow</code> 权限<br><img src="../images/%E5%8A%A8%E6%80%81%E8%B0%83%E8%AF%95%E7%9A%84%E9%82%A3%E4%BA%9B%E4%BA%8B%E5%84%BF/debugserver%E6%9D%83%E9%99%90.png" alt="debugserver权限"></li>
 <li>通过<code>ldid</code>命令重新签名<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ldid -S debugserver.entitlements debugserver</span><br></pre></td></tr></table></figure></li>
 <li>将已经签好权限的<code>debugserver</code>放到<code>/usr/bin</code>目录，便于找到<code>debugserver</code>指令 </li>
-<li><code>debugserver</code>添加执行权限<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">xhmod +x &#x2F;usr&#x2F;bin&#x2F;debugserver</span><br></pre></td></tr></table></figure>
-<h4 id="让debugserver附加到某个APP进程"><a href="#让debugserver附加到某个APP进程" class="headerlink" title="让debugserver附加到某个APP进程"></a>让debugserver附加到某个APP进程</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">debugserver *:端⼝口号 -a 进程</span><br></pre></td></tr></table></figure></li>
-<li><strong>*:端口号</strong> <ul>
-<li>使用iPhone的某个端口启动debugserver服务(只要不是保留端⼝号就行)</li>
+<li><code>debugserver</code>添加执行权限<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">xhmod +x &#x2F;usr&#x2F;bin&#x2F;debugserver</span><br></pre></td></tr></table></figure></li>
 </ul>
-</li>
-<li><strong>-a 进程</strong> <ul>
-<li>输入APP的进程信息(进程ID或者进程名称)</li>
-</ul>
-</li>
-</ul>
-<h4 id="在Mac上启动LLDB，远程连接iPhone上的debugserver服务"><a href="#在Mac上启动LLDB，远程连接iPhone上的debugserver服务" class="headerlink" title="在Mac上启动LLDB，远程连接iPhone上的debugserver服务"></a>在Mac上启动LLDB，远程连接iPhone上的debugserver服务</h4><ul>
-<li>启动LLDB<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">lldb</span><br><span class="line">(lldb)</span><br></pre></td></tr></table></figure></li>
-<li>连接debugserver服务<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">(lldb) process connect connect:&#x2F;&#x2F;手机IP地址:debugserver服务端⼝号</span><br></pre></td></tr></table></figure></li>
-<li>使用LLDB的<code>c</code>命令让程序先继续运⾏<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">(lldb) c</span><br></pre></td></tr></table></figure></li>
-<li>接下来就可以使⽤用LLDB命令调试APP</li>
-</ul>
-<h4 id="通过debugserver启动APP"><a href="#通过debugserver启动APP" class="headerlink" title="通过debugserver启动APP"></a>通过debugserver启动APP</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">debugserver -x auto *:端⼝号 APP的可执⾏文件路径</span><br></pre></td></tr></table></figure>
+<p><strong>3、让 debugserver 附加到某个 App 进程</strong></p>
+<ul>
+<li><p>执行下面的命令:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">debugserver *:端口号 -a 进程</span><br></pre></td></tr></table></figure>
 
+<p>*:端口号：使用 iPhone 的某个端口启动 debugserver 服务(只要不是保留端⼝号就行)</p>
+<p>-a 进程：输入 App 的进程信息(进程 ID 或者进程名称)</p>
+</li>
+</ul>
+<p><strong>4、在 Mac 上启动 LLDB，远程连接 iPhone 上的 debugserver 服务</strong></p>
+<ul>
+<li><p>启动LLDB</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">lldb</span><br><span class="line">(lldb)</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>连接 debugserver 服务 </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">(lldb) process connect connect:&#x2F;&#x2F;手机IP地址:debugserver服务端⼝号</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>使用 LLDB 的 <code>c</code> 命令让程序先继续运⾏</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">(lldb) c</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>接下来就可以使⽤用 LLDB 命令调试App</p>
+</li>
+</ul>
+<p><strong>5、通过debugserver启动App</strong></p>
+<ul>
+<li><p>执行下面的命令：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">debugserver -x auto *:端⼝号 APP的可执⾏文件路径</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
 <h3 id="四、常用LLDB指令"><a href="#四、常用LLDB指令" class="headerlink" title="四、常用LLDB指令"></a>四、常用LLDB指令</h3><ul>
 <li><p>指令的格式是</p>
+  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;command&gt; [&lt;subcommand&gt; [&lt;subcommand&gt;...]] &lt;action&gt; [-options [option-value]] [argument [argument...]]</span><br></pre></td></tr></table></figure>
+
+<p>  <code>&lt;command&gt;</code>：命令</p>
+<p>  <code>&lt;subcommand&gt;</code>：子命令</p>
+<p>  <code>&lt;action&gt;</code>：命令操作，想在前面的命令序列的上下文中执行的一些操作</p>
+<p>  <code>&lt;options&gt;</code>：命令选项，行为修改器(action modifiers)，通常带有一些值。</p>
+<p>  <code>&lt;argument&gt;</code>：命令参数，据使用的命令的上下文来表示各种不同的东西</p>
+<p>  <code>[]</code>：表示命令是可选的，可以有也可以没有。</p>
+<p>  举个例子：给 <code>test</code> 函数设置断点</p>
+  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">breakpoint set -n test</span><br></pre></td></tr></table></figure>
+
+<p>  <strong>breakpoint</strong> 是 <code>&lt;command&gt;</code>,  <strong>set</strong> 是 <code>&lt;action&gt;</code>,  <strong>-n</strong> 是 <code>&lt;options&gt;</code> ，<strong>test</strong> 是  <code>&lt;argument&gt;</code></p>
 </li>
-<li><p>```<br>  <command> [<subcommand> [<subcommand>…]] <action> [-options [option-value]] [argument [argument…]]</p>
-  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">- &lt;command&gt;：命令</span><br><span class="line">- &lt;subcommand&gt;：子命令</span><br><span class="line">- &lt;action&gt;：命令操作，想在前面的命令序列的上下文中执行的一些操作</span><br><span class="line">- &lt;options&gt;：命令选项，行为修改器(action modifiers)，通常带有一些值。</span><br><span class="line">- &lt;argument&gt;：命令参数，据使用的命令的上下文来表示各种不同的东西</span><br><span class="line">- []：表示命令是可选的，可以有也可以没有。</span><br><span class="line">- 举个例子：给&#96;test&#96;函数设置断点</span><br></pre></td></tr></table></figure>
-<pre><code>breakpoint set -n test
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">        - **breakpoint** 是 &lt;command&gt;</span><br><span class="line">        - **set** 是 &lt;action&gt;</span><br><span class="line">        - **-n** 是 &lt;options&gt;</span><br><span class="line">        - **test** 是 &lt;argument&gt;</span><br><span class="line">- **help&lt;command&gt;**</span><br><span class="line">    - 查看指令的⽤用法</span><br><span class="line">    - 比如 **help breakpoint**、**help breakpoint set**</span><br><span class="line">- **expression&lt;cmd-options&gt; -- &lt;expr&gt;**</span><br><span class="line">    - 执行⼀个表达式</span><br><span class="line">        - &#96;&lt;cmd-options&gt;&#96; : 命令选项</span><br><span class="line">        - &#96;--&#96; : 命令选项结束符，表示所有的命令选项已经设置完毕，如果没有命令选项，&#96;--&#96; 可以省略</span><br><span class="line">        - &#96;&lt;expr&gt;&#96; : 需要执⾏的表达式</span><br></pre></td></tr></table></figure>
-    expression self.view.backgroundColor = [UIColor redColor]
-    ```</code></pre><ul>
-<li><code>expression</code>、<code>expression --</code> 和指令 <code>print</code>、<code>p</code>、<code>call</code>的效果一样 </li>
-<li><code>expression -O --</code>和指令<code>po</code>的效果⼀样</li>
-</ul>
+<li><p>可以查看指令的用法：<code>help&lt;command&gt;</code>，比如</p>
+  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">help breakpoint</span><br><span class="line">help breakpoint set</span><br></pre></td></tr></table></figure>
 </li>
-<li><p><strong>thread backtrace</strong></p>
+<li><p>执行⼀个表达式：<code>expression&lt;cmd-options&gt; -- &lt;expr&gt;</code></p>
+  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">expression self.view.backgroundColor &#x3D; [UIColor redColor]</span><br></pre></td></tr></table></figure>
+
 <ul>
-<li>打印线程的堆栈信息 </li>
-<li>和指令<code>bt</code>的效果一样</li>
+<li><code>&lt;cmd-options&gt;</code> : 命令选项</li>
+<li><code>--</code> : 命令选项结束符，表示所有的命令选项已经设置完毕，如果没有命令选项，<code>--</code> 可以省略</li>
 </ul>
 </li>
-<li><p><strong>thread return [<expr>]</strong></p>
+<li><p><code>&lt;expr&gt;</code> : 需要执⾏的表达式</p>
 <ul>
-<li>让函数直接返回某个值，不会执行断点后面的代码</li>
+<li><code>expression</code>、<code>expression --</code> 和指令  <code>print</code>、 <code>p</code>、 <code>call</code>的效果一样 </li>
+<li><code>expression -O --</code> 和指令 <code>po</code> 的效果⼀样</li>
 </ul>
 </li>
-<li><p><strong>frame variable [<variable name>]</strong></p>
-<ul>
-<li>打印当前栈帧的变量量</li>
-</ul>
+<li><p>打印线程的堆栈信息，和指令 <code>bt</code> 的效果一样</p>
+  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">thread backtrace</span><br></pre></td></tr></table></figure>
 </li>
-<li><p><strong>thread continue</strong>、<strong>continue</strong>、<strong>c</strong> :程序继续运⾏行行</p>
+<li><p>让函数直接返回某个值，不会执行断点后面的代码</p>
+  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">thread return [&lt;expr&gt;]</span><br></pre></td></tr></table></figure>
 </li>
-<li><p><strong>thread step-over</strong>、<strong>next</strong>、<strong>n</strong>:单步运⾏，把子函数当做整体一步执⾏</p>
+<li><p>打印当前栈帧的变量量</p>
+  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">frame variable [&lt;variable name&gt;]</span><br></pre></td></tr></table></figure>
 </li>
-<li><p><strong>thread step-in</strong>、<strong>step</strong>、<strong>s</strong>:单步运行，遇到⼦函数会进入子函数</p>
+<li><p>程序继续运行</p>
+  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">thread continue</span><br><span class="line">continue</span><br><span class="line">c</span><br></pre></td></tr></table></figure>
 </li>
-<li><p><strong>thread step-out</strong>、<strong>finish</strong>:直接执⾏完当前函数的所有代码，返回到上一个函数 </p>
+<li><p>单步运⾏，把子函数当做整体一步执⾏</p>
+  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">thread step-over</span><br><span class="line">next</span><br><span class="line">n</span><br></pre></td></tr></table></figure>
 </li>
-<li><p><strong>thread step-inst-over</strong>、<strong>nexti</strong>、<strong>ni</strong></p>
+<li><p>单步运行，遇到⼦函数会进入子函数</p>
+  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">thread step-in</span><br><span class="line">step</span><br><span class="line">s</span><br></pre></td></tr></table></figure>
 </li>
-<li><p><strong>thread step-inst</strong>、<strong>stepi</strong>、<strong>si</strong></p>
+<li><p>直接执⾏完当前函数的所有代码，返回到上一个函数 </p>
+  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">thread step-out</span><br><span class="line">finish</span><br></pre></td></tr></table></figure>
 </li>
-<li><p><strong>si</strong>、<strong>ni</strong> 和 <strong>s</strong>、<strong>n</strong> 类似</p>
-<ul>
-<li><strong>s</strong>、<strong>n</strong>是源码级别 </li>
-<li><strong>si</strong>、<strong>ni</strong>是汇编指令级别</li>
-</ul>
+<li><p>设置断点</p>
+  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">breakpoint set -a 函数地址</span><br><span class="line">breakpoint set -n 函数名</span><br><span class="line">breakpoint set -n test</span><br><span class="line">breakpoint set -n touchesBegan:withEvent:</span><br><span class="line">breakpoint set -n &quot;-[ViewController-touchesBegan:withEvent:]&quot;</span><br><span class="line">breakpoint set -r 正则表达式</span><br><span class="line">breakpoint set -s 动态库 -n 函数名</span><br></pre></td></tr></table></figure>
 </li>
-<li><p><strong>breakpoint set</strong></p>
-<ul>
-<li>设置断点</li>
-<li><strong>breakpoint set -a 函数地址</strong></li>
-<li><strong>breakpoint set -n 函数名</strong><ul>
-<li><code>breakpoint set -n test</code></li>
-<li><code>breakpoint set -n touchesBegan:withEvent:</code></li>
-<li><code>breakpoint set -n &quot;-[ViewController-touchesBegan:withEvent:]&quot;</code></li>
-</ul>
+<li><p>列出所有的断点(每个断点都有⾃己的编号)</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">breakpoint list</span><br></pre></td></tr></table></figure>
 </li>
-<li><strong>breakpoint set -r 正则表达式</strong></li>
-<li><strong>breakpoint set -s 动态库 -n 函数名</strong></li>
-</ul>
+<li><p>禁用、启用、删除断点</p>
+  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">breakpoint disable 断点编号</span><br><span class="line">breakpoint enable 断点编号 </span><br><span class="line">breakpoint delete 断点编号</span><br></pre></td></tr></table></figure>
 </li>
-<li><p><strong>breakpoint list</strong></p>
-<ul>
-<li>列出所有的断点(每个断点都有⾃己的编号)</li>
-</ul>
+<li><p>给断点预先设置需要执行的命令，到触发断点时，就会按顺序执行   </p>
+  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">breakpoint command add 断点编号</span><br></pre></td></tr></table></figure>
 </li>
-<li><p><strong>breakpoint disable 断点编号</strong> </p>
-<ul>
-<li>禁用断点</li>
-</ul>
+<li><p>查看某个断点设置的命令</p>
+  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">breakpoint command list 断点编号*</span><br></pre></td></tr></table></figure>
 </li>
-<li><p><strong>breakpoint enable 断点编号</strong> </p>
-<ul>
-<li>启用断点</li>
-</ul>
+<li><p>删除某个断点设置的命令</p>
+  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">breakpoint command delete 断点编号</span><br></pre></td></tr></table></figure>
 </li>
-<li><p><strong>breakpoint delete 断点编号</strong> </p>
-<ul>
-<li>删除断点</li>
-</ul>
+<li><p>查找某个类型的信息</p>
+  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">image lookup -t 类型</span><br></pre></td></tr></table></figure>
 </li>
-<li><p><strong>breakpoint command add 断点编号</strong>   </p>
-<ul>
-<li>给断点预先设置需要执行的命令，到触发断点时，就会按顺序执行</li>
-</ul>
+<li><p>根据内存地址查找在模块中的位置</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">image lookup -a 地址</span><br></pre></td></tr></table></figure>
 </li>
-<li><p><strong>breakpoint command list 断点编号</strong> </p>
-<ul>
-<li>查看某个断点设置的命令</li>
-</ul>
+<li><p>查找某个符号或者函数的位置</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">image lookup -n 符号或者函数名</span><br></pre></td></tr></table></figure>
 </li>
-<li><p><strong>breakpoint command delete 断点编号</strong></p>
-<ul>
-<li>删除某个断点设置的命令</li>
-</ul>
+<li><p>列出所加载的模块信息</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">image list</span><br></pre></td></tr></table></figure>
 </li>
-<li><p>内存断点 </p>
-<ul>
-<li>在内存数据发生改变的时候触发 </li>
-<li><strong>watchpoint set variable 变量</strong><ul>
-<li><code>watchpoint set variable self-&gt;age</code></li>
-</ul>
-</li>
-<li><strong>watchpoint set expression 地址</strong><ul>
-<li><code>watchpoint set expression &amp;(self-&gt;_age)</code></li>
-</ul>
-</li>
-<li><strong>watchpoint list</strong></li>
-<li><strong>watchpoint disable 断点编号</strong> </li>
-<li><strong>watchpoint enable 断点编号</strong> </li>
-<li><strong>watchpoint delete 断点编号</strong> </li>
-<li><strong>watchpoint command add 断点编号</strong> </li>
-<li><strong>watchpoint command list 断点编号</strong> </li>
-<li><strong>watchpoint command delete 断点编号</strong></li>
-</ul>
-</li>
-<li><p><strong>image lookup</strong></p>
-<ul>
-<li><strong>image lookup -t 类型</strong> :查找某个类型的信息</li>
-<li><strong>image lookup -a 地址</strong> :根据内存地址查找在模块中的位置</li>
-<li><strong>image lookup -n 符号或者函数名</strong> :查找某个符号或者函数的位置</li>
-</ul>
-</li>
-<li><p>image list</p>
-<ul>
-<li>列出所加载的模块信息</li>
-<li><code>image list -o -f</code><ul>
-<li>打印出模块的偏移地址、全路径</li>
-</ul>
-</li>
-</ul>
-</li>
-<li><p>小技巧</p>
-<ul>
-<li>敲Enter，会自动执行上次的命令 </li>
-<li>绝大部分指令都可以使用缩写</li>
-</ul>
+<li><p>打印出模块的偏移地址、全路径</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">image list -o -f</span><br></pre></td></tr></table></figure>
+
 </li>
 </ul>
 
