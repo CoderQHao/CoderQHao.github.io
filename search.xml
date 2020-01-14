@@ -414,6 +414,313 @@
       </tags>
   </entry>
   <entry>
+    <title>加密，签名，证书详解</title>
+    <url>/2018/06/04/%E5%8A%A0%E5%AF%86%EF%BC%8C%E7%AD%BE%E5%90%8D%EF%BC%8C%E8%AF%81%E4%B9%A6%E8%AF%A6%E8%A7%A3/</url>
+    <content><![CDATA[<blockquote>
+<p>对加密、签名、证书的一些总结</p>
+</blockquote>
+<a id="more"></a>
+
+<h4 id="1、首先来了解一下加密解密"><a href="#1、首先来了解一下加密解密" class="headerlink" title="1、首先来了解一下加密解密"></a>1、首先来了解一下加密解密</h4><ul>
+<li><p>根据密钥的使用方法，可以将密码分为 2 种</p>
+<ul>
+<li><p>对称密码</p>
+<p><img src="/images/%E5%8A%A0%E5%AF%86%EF%BC%8C%E7%AD%BE%E5%90%8D%EF%BC%8C%E8%AF%81%E4%B9%A6%E8%AF%A6%E8%A7%A3/%E5%8A%A0%E5%AF%86%E8%A7%A3%E5%AF%861.png" alt="加密解密1"></p>
+</li>
+<li><p>公钥密码（非对称密码）</p>
+<p><img src="/images/%E5%8A%A0%E5%AF%86%EF%BC%8C%E7%AD%BE%E5%90%8D%EF%BC%8C%E8%AF%81%E4%B9%A6%E8%AF%A6%E8%A7%A3/%E5%8A%A0%E5%AF%86%E8%A7%A3%E5%AF%862.png" alt="加密解密2"></p>
+</li>
+</ul>
+</li>
+</ul>
+<h5 id="对称密码（Symmetric-Cryptography）"><a href="#对称密码（Symmetric-Cryptography）" class="headerlink" title="对称密码（Symmetric Cryptography）"></a>对称密码（Symmetric Cryptography）</h5><ul>
+<li><p>常见的对称密码算法有</p>
+<ul>
+<li>DES<ul>
+<li>DES 是一种将 64bit 明文加密成 64bit 密文的对称密码算法，密钥长度是 56bit</li>
+<li>规格上来说，密钥长度是 64bit，但每隔 7bit 会设置一个用于错误检查的 bit，因此密钥长度实质上是 56bit</li>
+<li>由于 DES 每次只能加密 64bit 的数据，遇到比较大的数据，需要对 DES 加密进行迭代（反复）</li>
+<li>目前已经可以在短时间内被破解，所以不建议使用</li>
+</ul>
+</li>
+<li>3DES<ul>
+<li>3DES，将 DES 重复 3 次所得到的一种密码算法，也叫做 3 重 DE</li>
+<li>目前还被一些银行等机构使用，但处理速度不高，安全性逐渐暴露出问题</li>
+</ul>
+</li>
+<li><strong>AES</strong><ul>
+<li>取代 DES 成为新标准的一种对称密码算法</li>
+<li>AES的密钥长度有 128、192、256bit 三种</li>
+<li>在 2000 年时选择 Rijindael 算法作为 AES 的实现</li>
+<li>目前 AES，已经逐步取代 DES、3DES，成为首选的对称密码算法</li>
+<li>一般来说，我们也不应该去使用任何自制的密码算法，而是应该使用 AES，它经过了全世界密码学家所进行的高品质验证工作</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>密钥配送问题</p>
+<ul>
+<li><p>在使用对称密码时，一定会遇到密钥配送问题</p>
+</li>
+<li><p>假设，Alice 将使用对称密码加密过的消息发给了 Bob</p>
+</li>
+<li><p>只有将密钥发送给 Bob，Bob 才能完成解密</p>
+</li>
+<li><p>在发送密钥过程中，可能会被 Eve 窃取密钥，最后 Eve 也能完成解密</p>
+<p><img src="/images/%E5%8A%A0%E5%AF%86%EF%BC%8C%E7%AD%BE%E5%90%8D%EF%BC%8C%E8%AF%81%E4%B9%A6%E8%AF%A6%E8%A7%A3/%E5%8A%A0%E5%AF%86%E8%A7%A3%E5%AF%863.png" alt="加密解密3"></p>
+</li>
+</ul>
+</li>
+<li><p>如何解决密钥配送问题</p>
+<ul>
+<li>事先共享密钥</li>
+<li>密钥分配中心</li>
+<li>Diffie-Hellman 密钥交换</li>
+<li><strong>公钥密码</strong></li>
+</ul>
+</li>
+</ul>
+<h5 id="公钥密码（Public-key-Cryptography）"><a href="#公钥密码（Public-key-Cryptography）" class="headerlink" title="公钥密码（Public-key Cryptography）"></a>公钥密码（Public-key Cryptography）</h5><ul>
+<li><p>在公钥密码中</p>
+<ul>
+<li>密钥分为加密密钥、解密密钥 2 种，它们并不是同一个密钥</li>
+<li>加密密钥，一般是公开的，因此该密钥称为公钥（public key）</li>
+<li>解密密钥，由消息接收者自己保管的，不能公开，因此也称为私钥（private key）</li>
+<li>公钥和私钥是一一对应的，是不能单独生成的，一对公钥和密钥统称为密钥对（key pair）</li>
+<li>由公钥加密的密文，必须使用与该公钥对应的私钥才能解密</li>
+<li>由私钥加密的密文，必须使用与该私钥对应的公钥才能解密</li>
+</ul>
+</li>
+<li><p>解决密钥配送问题</p>
+<ul>
+<li><p>由消息的接收者，生成一对公钥、私钥</p>
+</li>
+<li><p>将公钥发给消息的发送者</p>
+</li>
+<li><p>消息的发送者使用公钥加密消息</p>
+<p><img src="/images/%E5%8A%A0%E5%AF%86%EF%BC%8C%E7%AD%BE%E5%90%8D%EF%BC%8C%E8%AF%81%E4%B9%A6%E8%AF%A6%E8%A7%A3/%E5%8A%A0%E5%AF%86%E8%A7%A3%E5%AF%864.png" alt="加密解密4"></p>
+</li>
+</ul>
+</li>
+<li><p>RSA</p>
+<ul>
+<li>目前使用最广泛的公钥密码算法是 RSA</li>
+</ul>
+</li>
+</ul>
+<h5 id="混合密码系统（Hybrid-Cryptosystem）"><a href="#混合密码系统（Hybrid-Cryptosystem）" class="headerlink" title="混合密码系统（Hybrid Cryptosystem）"></a>混合密码系统（Hybrid Cryptosystem）</h5><ul>
+<li><p>对称密码的缺点</p>
+<ul>
+<li>不能很好地解决密钥配送问题</li>
+</ul>
+</li>
+<li><p>公钥密码的缺点</p>
+<ul>
+<li>加密解密速度比较慢</li>
+</ul>
+</li>
+<li><p>混合密码系统，是将对称密码和公钥密码的优势相结合的方法</p>
+<ul>
+<li><p>解决了公钥密码速度慢的问题</p>
+</li>
+<li><p>并通过公钥密码解决了对称密码的密钥配送问题</p>
+</li>
+</ul>
+</li>
+<li><p>网络上的密码通信所用的SSL/TLS都运用了混合密码系统</p>
+</li>
+</ul>
+<h5 id="混合密码-加密"><a href="#混合密码-加密" class="headerlink" title="混合密码-加密"></a>混合密码-加密</h5><ul>
+<li><p>会话密钥（session key）</p>
+<ul>
+<li><p>为本次通信随机生成的临时密钥</p>
+</li>
+<li><p>作为对称密码的密钥，用于加密消息，提高速度</p>
+</li>
+</ul>
+</li>
+<li><p>加密步骤（发送消息）</p>
+<p>1.首先，消息发送者要拥有消息接收者的公钥</p>
+<p>2.生成会话密钥，作为对称密码的密钥，加密消息</p>
+<p>3.用消息接收者的公钥，加密会话密钥</p>
+<p>4.将前 2 步生成的加密结果，一并发给消息接收者</p>
+</li>
+<li><p>发送出去的内容包括</p>
+<ul>
+<li><p>用会话密钥加密的消息（加密方法：对称密码）</p>
+</li>
+<li><p>用公钥加密的会话密钥（加密方法：公钥密码）</p>
+</li>
+</ul>
+</li>
+</ul>
+<p><img src="/images/%E5%8A%A0%E5%AF%86%EF%BC%8C%E7%AD%BE%E5%90%8D%EF%BC%8C%E8%AF%81%E4%B9%A6%E8%AF%A6%E8%A7%A3/%E5%8A%A0%E5%AF%86%E8%A7%A3%E5%AF%865.png" alt="加密解密5"></p>
+<h5 id="混合密码-解密"><a href="#混合密码-解密" class="headerlink" title="混合密码-解密"></a>混合密码-解密</h5><ul>
+<li><p>解密步骤（收到消息）</p>
+<p>1.消息接收者用自己的私钥解密出会话密钥</p>
+<p>2.再用第 1 步解密出来的会话密钥，解密消息</p>
+</li>
+</ul>
+<p><img src="/images/%E5%8A%A0%E5%AF%86%EF%BC%8C%E7%AD%BE%E5%90%8D%EF%BC%8C%E8%AF%81%E4%B9%A6%E8%AF%A6%E8%A7%A3/%E5%8A%A0%E5%AF%86%E8%A7%A3%E5%AF%866.png" alt="加密解密6"></p>
+<h5 id="混合密码-加密解密流程"><a href="#混合密码-加密解密流程" class="headerlink" title="混合密码-加密解密流程"></a>混合密码-加密解密流程</h5><ul>
+<li><p>Alice &gt;&gt;&gt;&gt;&gt; Bob</p>
+<ul>
+<li><p>发送过程，加密过程</p>
+<p>1.Bob 先生成一对公钥、私钥</p>
+<p>2.Bob 把公钥共享给 Alice</p>
+<p>3.Alice 随机生成一个会话密钥（临时密钥）</p>
+<p>4.Alice 用会话密钥加密需要发送的消息（使用的是对称密码加密）</p>
+<p>5.Alice 用 Bob 的公钥加密会话密钥（使用的是公钥密码加密，也就是非对称密码加密）</p>
+<p>6.Alice 把第 4、5 步的加密结果，一并发送给 Bob</p>
+</li>
+<li><p>接收过程，解密过程</p>
+<p>1.Bob 利用自己的私钥解密会话密钥（使用的是公钥密码解密，也就是非对称密码解密）</p>
+<p>2.Bob 利用会话密钥解密发送过来的消息（使用的是对称密码解密）</p>
+</li>
+</ul>
+</li>
+</ul>
+<h4 id="2、单向散列函数（One-way-hash-function）"><a href="#2、单向散列函数（One-way-hash-function）" class="headerlink" title="2、单向散列函数（One-way hash function）"></a>2、单向散列函数（One-way hash function）</h4><ul>
+<li><p>单向散列函数，又被称为消息摘要函数（message digest function），哈希函数</p>
+</li>
+<li><p>输出的散列值，也被称为消息摘要（message digest）、指纹（fingerprint）</p>
+</li>
+<li><p>单向散列函数，可以根据消息内容计算出散列值</p>
+</li>
+<li><p>散列值的长度和消息的长度无关，无论消息是 1bit、10M、100G，单向散列函数都会计算出固定长度的散列值</p>
+<p><img src="/images/%E5%8A%A0%E5%AF%86%EF%BC%8C%E7%AD%BE%E5%90%8D%EF%BC%8C%E8%AF%81%E4%B9%A6%E8%AF%A6%E8%A7%A3/%E5%8A%A0%E5%AF%86%E8%A7%A3%E5%AF%867.png" alt="加密解密7"></p>
+</li>
+<li><p>常见的几种单向散列函数</p>
+<ul>
+<li>MD4、MD5<ul>
+<li>产生 128bit 的散列值，MD 就是 Message Digest 的缩写，目前已经不安全</li>
+<li>Mac 终端上默认可以使用 md5 命令</li>
+</ul>
+</li>
+<li>SHA-1<ul>
+<li>产生 160bit 的散列值，目前已经不安全</li>
+</ul>
+</li>
+<li>SHA-2<ul>
+<li>SHA-256、SHA-384、SHA-512，散列值长度分别是 256bit、384bit、512bit</li>
+</ul>
+</li>
+<li>SHA-3<ul>
+<li>全新标准</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h5 id="单向散列函数的特点"><a href="#单向散列函数的特点" class="headerlink" title="单向散列函数的特点"></a>单向散列函数的特点</h5><ul>
+<li>根据任意长度的消息，计算出固定长度的散列值</li>
+<li>计算速度快，能快速计算出散列值</li>
+<li>消息不同，散列值也不同</li>
+<li>具备单向性</li>
+</ul>
+<p><img src="/images/%E5%8A%A0%E5%AF%86%EF%BC%8C%E7%AD%BE%E5%90%8D%EF%BC%8C%E8%AF%81%E4%B9%A6%E8%AF%A6%E8%A7%A3/%E5%8A%A0%E5%AF%86%E8%A7%A3%E5%AF%868.png" alt="加密解密8"></p>
+<p><img src="/images/%E5%8A%A0%E5%AF%86%EF%BC%8C%E7%AD%BE%E5%90%8D%EF%BC%8C%E8%AF%81%E4%B9%A6%E8%AF%A6%E8%A7%A3/%E5%8A%A0%E5%AF%86%E8%A7%A3%E5%AF%869.png" alt="加密解密9"></p>
+<h5 id="单向散列函数的应用-–-防止数据被篡改"><a href="#单向散列函数的应用-–-防止数据被篡改" class="headerlink" title="单向散列函数的应用 – 防止数据被篡改"></a>单向散列函数的应用 – 防止数据被篡改</h5><p><img src="/images/%E5%8A%A0%E5%AF%86%EF%BC%8C%E7%AD%BE%E5%90%8D%EF%BC%8C%E8%AF%81%E4%B9%A6%E8%AF%A6%E8%A7%A3/%E5%8A%A0%E5%AF%86%E8%A7%A3%E5%AF%8610.png" alt="加密解密10"></p>
+<h4 id="3、数字签名"><a href="#3、数字签名" class="headerlink" title="3、数字签名"></a>3、数字签名</h4><h5 id="想象以下场景"><a href="#想象以下场景" class="headerlink" title="想象以下场景"></a>想象以下场景</h5><p><img src="/images/%E5%8A%A0%E5%AF%86%EF%BC%8C%E7%AD%BE%E5%90%8D%EF%BC%8C%E8%AF%81%E4%B9%A6%E8%AF%A6%E8%A7%A3/%E5%8A%A0%E5%AF%86%E8%A7%A3%E5%AF%8611.png" alt="加密解密11"></p>
+<ul>
+<li>Alice 发的内容有可能是被篡改的，或者有人伪装成 Alice 发消息，或者就是 Alice 发的，但她可以否认</li>
+<li>问题来了：Bob 如何确定这段消息的真实性？如何识别篡改、伪装、否认？</li>
+<li>解决方案：数字签名</li>
+</ul>
+<h5 id="数字签名"><a href="#数字签名" class="headerlink" title="数字签名"></a>数字签名</h5><p>在数字签名技术中，有以下2种行为</p>
+<ul>
+<li><p>生成签名</p>
+<ul>
+<li>由消息的发送者完成，通过“签名密钥”生成</li>
+</ul>
+</li>
+<li><p>验证签名</p>
+<ul>
+<li>由消息的接收者完成，通过“验证密钥”验</li>
+</ul>
+</li>
+</ul>
+<p>那么问题来了：如何能保证这个签名是消息发送者自己签的？</p>
+<ul>
+<li>用消息发送者的私钥进行签名</li>
+</ul>
+<p><img src="/images/%E5%8A%A0%E5%AF%86%EF%BC%8C%E7%AD%BE%E5%90%8D%EF%BC%8C%E8%AF%81%E4%B9%A6%E8%AF%A6%E8%A7%A3/%E5%8A%A0%E5%AF%86%E8%A7%A3%E5%AF%8612.png" alt="加密解密12"></p>
+<pre><code>在公钥密码中，任何人都可以使用公钥进行加密</code></pre><p><img src="/images/%E5%8A%A0%E5%AF%86%EF%BC%8C%E7%AD%BE%E5%90%8D%EF%BC%8C%E8%AF%81%E4%B9%A6%E8%AF%A6%E8%A7%A3/%E5%8A%A0%E5%AF%86%E8%A7%A3%E5%AF%8613.png" alt="加密解密13"></p>
+<pre><code>在数字签名中，任何人都可以使用公钥验证签名</code></pre><h5 id="数字签名的过程"><a href="#数字签名的过程" class="headerlink" title="数字签名的过程"></a>数字签名的过程</h5><ul>
+<li><p>Alice 生成密钥对，将公钥发送给 Bob</p>
+</li>
+<li><p>Alice 用自己的私钥进行加密（生成签名）</p>
+</li>
+<li><p>Alice 将消息和签名发送给 Bob</p>
+</li>
+<li><p>Bob 用公钥验证签名</p>
+<p><img src="/images/%E5%8A%A0%E5%AF%86%EF%BC%8C%E7%AD%BE%E5%90%8D%EF%BC%8C%E8%AF%81%E4%B9%A6%E8%AF%A6%E8%A7%A3/%E5%8A%A0%E5%AF%86%E8%A7%A3%E5%AF%8614.png" alt="加密解密14"></p>
+</li>
+</ul>
+<h5 id="数字签名-–-疑惑"><a href="#数字签名-–-疑惑" class="headerlink" title="数字签名 – 疑惑"></a>数字签名 – 疑惑</h5><ul>
+<li>如果有人篡改了文件内容或者签名内容，会是什么结果？<ul>
+<li>签名验证失败，证明内容被篡改</li>
+</ul>
+</li>
+<li>数字签名不能保证机密性？<ul>
+<li>数字签名的作用不是为了保证机密性，仅仅是为了能够识别内容有没有被篡改</li>
+</ul>
+</li>
+<li>数字签名的作用<ul>
+<li>确认消息的完整性</li>
+<li>识别消息是否被篡改</li>
+</ul>
+</li>
+</ul>
+<h5 id="数字签名无法解决的问题"><a href="#数字签名无法解决的问题" class="headerlink" title="数字签名无法解决的问题"></a>数字签名无法解决的问题</h5><ul>
+<li><p>要正确使用签名，前提是</p>
+<ul>
+<li>用于验证签名的公钥必须属于真正的发送者</li>
+</ul>
+</li>
+<li><p>如果遭遇了中间人攻击，那么</p>
+<ul>
+<li>公钥将是伪造的</li>
+<li>数字签名将失效</li>
+</ul>
+</li>
+<li><p>所以在验证签名之前，首先得先验证公钥的合法性</p>
+</li>
+<li><p>如何验证公钥的合法性？</p>
+<ul>
+<li>证书</li>
+</ul>
+</li>
+</ul>
+<p><img src="/images/%E5%8A%A0%E5%AF%86%EF%BC%8C%E7%AD%BE%E5%90%8D%EF%BC%8C%E8%AF%81%E4%B9%A6%E8%AF%A6%E8%A7%A3/%E5%8A%A0%E5%AF%86%E8%A7%A3%E5%AF%8615.png" alt="加密解密15"></p>
+<h4 id="4、证书"><a href="#4、证书" class="headerlink" title="4、证书"></a>4、证书</h4><ul>
+<li><p>密码学中的证书，全称叫公钥证书（Public-key Certificate，PKC），跟驾驶证类似</p>
+<ul>
+<li><p>里面有姓名、邮箱等个人信息，以及此人的公钥</p>
+</li>
+<li><p>并由认证机构（Certificate Authority，CA）施加数字签名</p>
+</li>
+</ul>
+</li>
+<li><p>CA就是能够认定“公钥确实属于此人”并能够生成数字签名的个人或者组织</p>
+<ul>
+<li><p>有国际性组织、政府设立的组织</p>
+</li>
+<li><p>有通过提供认证服务来盈利的企业</p>
+</li>
+<li><p>个人也可以成立认证机构</p>
+</li>
+</ul>
+</li>
+</ul>
+<h5 id="证书的利用"><a href="#证书的利用" class="headerlink" title="证书的利用"></a>证书的利用</h5><p><img src="/images/%E5%8A%A0%E5%AF%86%EF%BC%8C%E7%AD%BE%E5%90%8D%EF%BC%8C%E8%AF%81%E4%B9%A6%E8%AF%A6%E8%A7%A3/%E5%8A%A0%E5%AF%86%E8%A7%A3%E5%AF%8616.png" alt="加密解密16"></p>
+<h5 id="证书的注册和下载"><a href="#证书的注册和下载" class="headerlink" title="证书的注册和下载"></a>证书的注册和下载</h5><p><img src="/images/%E5%8A%A0%E5%AF%86%EF%BC%8C%E7%AD%BE%E5%90%8D%EF%BC%8C%E8%AF%81%E4%B9%A6%E8%AF%A6%E8%A7%A3/%E5%8A%A0%E5%AF%86%E8%A7%A3%E5%AF%8617.png" alt="加密解密17"></p>
+]]></content>
+      <categories>
+        <category>iOS</category>
+      </categories>
+  </entry>
+  <entry>
     <title>对RunLoop的一些看法</title>
     <url>/2018/04/12/%E5%AF%B9RunLoop%E7%9A%84%E4%B8%80%E4%BA%9B%E7%9C%8B%E6%B3%95/</url>
     <content><![CDATA[<h3 id="RunLoop-介绍"><a href="#RunLoop-介绍" class="headerlink" title="RunLoop 介绍"></a>RunLoop 介绍</h3><p>运行循环，在程序运行过程中循环做一些事情，如果没有 Runloop 程序执行完毕就会立即退出，如果有Runloop程序会一直运行，并且时时刻刻在等待用户的输入操作。RunLoop 可以在需要的时候自己跑起来运行，在没有操作的时候就停下来休息。充分节省 CPU 资源，提高程序性能。</p>
@@ -555,6 +862,158 @@
       </tags>
   </entry>
   <entry>
+    <title>KVO 到底在干什么？</title>
+    <url>/2018/03/21/KVO%E5%88%B0%E5%BA%95%E5%9C%A8%E5%B9%B2%E4%BB%80%E4%B9%88%EF%BC%9F/</url>
+    <content><![CDATA[<h4 id="一、KVO-的基本使用"><a href="#一、KVO-的基本使用" class="headerlink" title="一、KVO 的基本使用"></a>一、KVO 的基本使用</h4><p>首先我们来看一下 <code>KVO</code> 的基本使用，<code>KVO</code> 的全称 <code>Key-Value Observing</code>，俗称“键值监听”，可以用于监听某个对象属性值的改变。<br>  <a id="more"></a></p>
+<figure class="highlight objc"><table><tr><td class="code"><pre><span class="line">- (<span class="keyword">void</span>)viewDidLoad &#123;</span><br><span class="line">    [<span class="keyword">super</span> viewDidLoad];</span><br><span class="line">    Person *p1 = [[Person alloc] init];</span><br><span class="line">    Person *p2 = [[Person alloc] init];</span><br><span class="line">    p1.age = <span class="number">10</span>;</span><br><span class="line">    p2.age = <span class="number">20</span>;</span><br><span class="line">    <span class="comment">// self 监听 p1 的 age 属性</span></span><br><span class="line">    <span class="built_in">NSKeyValueObservingOptions</span> options = <span class="built_in">NSKeyValueObservingOptionNew</span> | <span class="built_in">NSKeyValueObservingOptionOld</span>;</span><br><span class="line">    [p1 addObserver:<span class="keyword">self</span> forKeyPath:<span class="string">@"age"</span> options:options context:<span class="literal">nil</span>];</span><br><span class="line">    p1.age = <span class="number">30</span>;</span><br><span class="line">    p2.age = <span class="number">40</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">- (<span class="keyword">void</span>)observeValueForKeyPath:(<span class="built_in">NSString</span> *)keyPath ofObject:(<span class="keyword">id</span>)object change:(<span class="built_in">NSDictionary</span>&lt;<span class="built_in">NSKeyValueChangeKey</span>,<span class="keyword">id</span>&gt; *)change context:(<span class="keyword">void</span> *)context</span><br><span class="line">&#123;</span><br><span class="line">    <span class="built_in">NSLog</span>(<span class="string">@"监听到%@的%@改变了%@"</span>, object, keyPath,change);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 打印内容</span></span><br><span class="line">监听到&lt;Person: <span class="number">0x600000108640</span>&gt;的age改变了&#123;</span><br><span class="line">    kind = <span class="number">1</span>;</span><br><span class="line">    new = <span class="number">30</span>;</span><br><span class="line">    old = <span class="number">10</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>从上述代码中可以看出，在添加监听之后，<code>age</code> 属性的值在发生改变时，就会通知到监听者，执行监听者的  <code>observeValueForKeyPath</code> 方法。</p>
+<h4 id="二、探寻-KVO-原理"><a href="#二、探寻-KVO-原理" class="headerlink" title="二、探寻 KVO 原理"></a>二、探寻 KVO 原理</h4><ul>
+<li><p>通过上述代码我们发现，一旦 <code>age</code> 属性的值发生改变时，就会通知到监听者，并且我们知道赋值操作都是调用属性的 <code>set</code> 方法，我们可以来到 <code>Person</code> 类中重写 <code>age</code> 的 <code>set</code> 方法，观察是否是 <code>KVO</code> 在 <code>set</code> 方法内部做了一些操作来通知监听者。</p>
+</li>
+<li><p>我们发现即使重写了 <code>set</code> 方法，<code>p1</code> 对象和 <code>p2</code> 对象调用同样的 <code>set</code> 方法，但是我们发现 <code>p1</code>除了调用 <code>set</code> 方法之外还会另外执行监听器的 <code>observeValueForKeyPath:ofObject:change:context:</code> 方法。</p>
+</li>
+<li><p>这说明 <code>KVO</code> 在运行时获取对 <code>p1</code> 对象做了一些改变。相当于在程序运行过程中，对 <code>p1</code> 对象做了一些变化，使得 <code>p1</code> 对象在调用 <code>setAge:</code> 方法的时候可能做了一些额外的操作，所以问题出在对象身上，两个对象在内存中肯定不一样，两个对象本质上也不一样。</p>
+</li>
+</ul>
+<h4 id="三、KVO-底层实现分析"><a href="#三、KVO-底层实现分析" class="headerlink" title="三、KVO 底层实现分析"></a>三、KVO 底层实现分析</h4><ul>
+<li>首先我们来看一下 <code>p1</code> 和 <code>p2</code> 在 <code>addObserver</code> 方法 前后的 <code>isa</code> 分别是什么</li>
+</ul>
+<p><img src="/images/KVO%E5%88%B0%E5%BA%95%E5%9C%A8%E5%B9%B2%E4%BB%80%E4%B9%88%EF%BC%9F/KVO.png" alt="KVO"></p>
+<ul>
+<li><p>通过上图我们发现，<code>p1</code> 对象执行过 <code>addObserver</code> 操作之后，<code>p1</code> 对象的 <code>isa</code> 指针由之前的指向类对象 <code>Person</code> 变为指向 <code>NSKVONotifyin_Person</code> 类对象，而 <code>p2</code> 对象没有任何改变。也就是说一旦 <code>p1</code> 对象添加了 <code>KVO</code> 监听以后，其 <code>isa</code> 指针就会发生变化，因此 <code>set</code> 方法的执行效果就不一样了。</p>
+</li>
+<li><p>那么我们先来观察 <code>p2</code> 对象在内容中是如何存储的，然后对比 <code>p2</code> 来观察 <code>p1</code> 。<br>首先我们知道，<code>p2</code> 在调用 <code>setAge:</code> 方法的时候，首先会通过 <code>p2</code> 对象中的 <code>isa</code> 指针找到 <code>Person</code> 类对象，然后在类对象中找到 <code>setAge:</code> 方法。然后找到方法对应的实现。如下图所示</p>
+<p><img src="/images/KVO%E5%88%B0%E5%BA%95%E5%9C%A8%E5%B9%B2%E4%BB%80%E4%B9%88%EF%BC%9F/person_isa.png" alt="person_isa"></p>
+</li>
+<li><p>但是刚才我们发现 <code>p1</code> 对象的 <code>isa</code> 指针在经过 <code>KVO</code> 监听之后已经指向了 <code>NSKVONotifyin_Person</code> 类对象，<code>NSKVONotifyin_Person</code> 其实是 <code>Person</code> 的子类，那么也就是说其 <code>superclass</code> 指针是指向 <code>Person</code> 类对象的，<code>NSKVONotifyin_Person</code> 是 runtime 在运行时生成的。那么 <code>p1</code> 对象在调用 <code>setAge:</code> 方法的时候，肯定会根据 <code>p1</code> 的 <code>isa</code> 找到 <code>NSKVONotifyin_Person</code>，在 <code>NSKVONotifyin_Person</code> 中找 <code>setAge:</code> 方法的实现。</p>
+</li>
+<li><p><code>NSKVONotifyin_Person</code> 中的 <code>setAge:</code> 方法中其实调用了 <code>Fundation</code> 框架中 C 语言函数 <code>_NSsetIntValueAndNotify</code>，<code>_NSsetIntValueAndNotify</code> 内部做的操作相当于:</p>
+<ul>
+<li>首先调用 willChangeValueForKey:</li>
+<li>之后调用父类的 setAge: 方法对成员变量赋值</li>
+<li>最后调用 didChangeValueForKey:</li>
+<li>didChangeValueForKey: 中会调用监听器的监听方法，最终来到监听者的 observeValueForKeyPath:ofObject:change:context: 方法中</li>
+</ul>
+</li>
+</ul>
+<h4 id="四、NSKVONotifyin-Person-内部结构是怎样的？"><a href="#四、NSKVONotifyin-Person-内部结构是怎样的？" class="headerlink" title="四、NSKVONotifyin_Person 内部结构是怎样的？"></a>四、NSKVONotifyin_Person 内部结构是怎样的？</h4><p>首先我们知道，<code>NSKVONotifyin_Person</code> 作为 <code>Person</code> 的子类，其 <code>superclass</code> 指针指向 <code>Person</code> 类，并且  <code>NSKVONotifyin_Person</code> 内部一定对 <code>setAge:</code> 方法做了单独的实现，那么 <code>NSKVONotifyin_Person</code> 同 <code>Person</code> 类的差别可能就在于其内存储的对象方法及实现不同。<br>我们通过 <code>runtime</code> 分别打印 <code>Person</code> 类对象和 <code>NSKVONotifyin_Person</code> 类对象内存储的对象方法</p>
+<figure class="highlight objc"><table><tr><td class="code"><pre><span class="line">- (<span class="keyword">void</span>)viewDidLoad </span><br><span class="line">&#123;</span><br><span class="line">    [<span class="keyword">super</span> viewDidLoad];</span><br><span class="line">    </span><br><span class="line">    Person *p1 = [[Person alloc] init];</span><br><span class="line">    p1.age = <span class="number">10</span>;</span><br><span class="line">    Person *p2 = [[Person alloc] init];</span><br><span class="line">    p2.age = <span class="number">20</span>;</span><br><span class="line">    <span class="comment">// self 监听 p1 的 age 属性</span></span><br><span class="line">    <span class="built_in">NSKeyValueObservingOptions</span> options = <span class="built_in">NSKeyValueObservingOptionNew</span> | <span class="built_in">NSKeyValueObservingOptionOld</span>;</span><br><span class="line">    [p1 addObserver:<span class="keyword">self</span> forKeyPath:<span class="string">@"age"</span> options:options context:<span class="literal">nil</span>];</span><br><span class="line">    [<span class="keyword">self</span> printMethods: object_getClass(p2)];</span><br><span class="line">    [<span class="keyword">self</span> printMethods: object_getClass(p1)];</span><br><span class="line">    [p1 removeObserver:<span class="keyword">self</span> forKeyPath:<span class="string">@"age"</span>];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">- (<span class="keyword">void</span>)printMethods:(Class)cls</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">unsigned</span> <span class="keyword">int</span> count ;</span><br><span class="line">    Method *methods = class_copyMethodList(cls, &amp;count);</span><br><span class="line">    <span class="built_in">NSMutableString</span> *methodNames = [<span class="built_in">NSMutableString</span> string];</span><br><span class="line">    [methodNames appendFormat:<span class="string">@"%@ - "</span>, cls];</span><br><span class="line">    <span class="keyword">for</span> (<span class="built_in">NSInteger</span> i = <span class="number">0</span> ; i &lt; count; i++) &#123;</span><br><span class="line">        Method method = methods[i];</span><br><span class="line">        <span class="built_in">NSString</span> *methodName  = <span class="built_in">NSStringFromSelector</span>(method_getName(method));</span><br><span class="line"></span><br><span class="line">        [methodNames appendString: methodName];</span><br><span class="line">        [methodNames appendString:<span class="string">@" "</span>];</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">NSLog</span>(<span class="string">@"%@"</span>,methodNames);</span><br><span class="line">    free(methods);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 打印内容</span></span><br><span class="line">Person - setAge: age</span><br><span class="line"><span class="built_in">NSKVONotifying_Person</span> - setAge: <span class="keyword">class</span> dealloc _isKVOA</span><br></pre></td></tr></table></figure>
+
+<p>通过上述代码我们发现 <code>NSKVONotifyin_Person</code> 中有 <code>4</code> 个对象方法。分别为 <code>setAge:</code>  <code>class</code> <code>dealloc</code> <code>_isKVOA</code>，那么至此我们可以知道 <code>NSKVONotifyin_Person</code> 的内存结构以及方法调用顺序。</p>
+<p><img src="/images/KVO%E5%88%B0%E5%BA%95%E5%9C%A8%E5%B9%B2%E4%BB%80%E4%B9%88%EF%BC%9F/NSKVONotifyin_Person.png" alt="NSKVONotifyin_Person"></p>
+<ul>
+<li><p>这里 <code>NSKVONotifyin_Person</code> 重写 <code>class</code> 方法是为了隐藏 <code>NSKVONotifyin_Person</code>，使其不被外界所看到。我们在 <code>p1</code> 添加过KVO监听之后，分别打印 <code>p1</code> 和 <code>p2</code> 对象的 <code>class</code> 可以发现他们都返回 <code>Person</code>。</p>
+<figure class="highlight objc"><table><tr><td class="code"><pre><span class="line"><span class="built_in">NSLog</span>(<span class="string">@"%@,%@"</span>,[p1 <span class="keyword">class</span>],[p2 <span class="keyword">class</span>]);</span><br><span class="line"><span class="comment">// 打印结果 Person,Person</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>如果 <code>NSKVONotifyin_Person</code> 不重写 <code>class</code> 方法，那么当对象要调用 <code>class</code> 对象方法的时候就会一直向上找来到 <code>Nsobject</code>，而 <code>Nsobect</code> 的 <code>class</code> 的实现大致为返回自己 <code>isa</code> 指向的类，返回 <code>p1</code> 的 <code>isa</code> 指向的类那么打印出来的类就是 <code>NSKVONotifyin_Person</code>，但是 Apple 爸爸不希望将 <code>NSKVONotifyin_Person</code> 类暴露出来，并且不希望我们知道 <code>NSKVONotifyin_Person</code> 内部实现，所以在内部重写了<code>class 对象方法</code>，直接返回 <code>Person</code> 类，所以外界在调用 <code>p1</code> 的 <code>class 对象方法</code>时，是 <code>Person</code> 类。这样 <code>p1</code> 给外界的感觉 <code>p1</code> 还是 <code>Person</code> 类，并不知道 <code>NSKVONotifyin_Person</code> 子类的存在。</p>
+<p>那么我们可以猜测 <code>NSKVONotifyin_Person</code>内重写的 <code>class</code> 内部实现大致为</p>
+<figure class="highlight objc"><table><tr><td class="code"><pre><span class="line">- (Class)<span class="keyword">class</span> </span><br><span class="line">&#123;</span><br><span class="line">     <span class="comment">// 得到类对象，再找到类对象父类</span></span><br><span class="line">     <span class="keyword">return</span> class_getSuperclass(object_getClass(<span class="keyword">self</span>));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<h4 id="五、验证-didChangeValueForKey-内部会调用-observer-的-observeValueForKeyPath-ofObject-change-context-方法"><a href="#五、验证-didChangeValueForKey-内部会调用-observer-的-observeValueForKeyPath-ofObject-change-context-方法" class="headerlink" title="五、验证 didChangeValueForKey: 内部会调用 observer 的 observeValueForKeyPath:ofObject:change:context: 方法"></a>五、验证 <strong>didChangeValueForKey:</strong> 内部会调用 observer 的 <strong>observeValueForKeyPath:ofObject:change:context:</strong> 方法</h4><ul>
+<li><p>我们在 <code>Person</code> 类中重写 <code>willChangeValueForKey:</code> 和 <code>didChangeValueForKey:</code> 方法，模拟它们的实现</p>
+<figure class="highlight objc"><table><tr><td class="code"><pre><span class="line">- (<span class="keyword">void</span>)setAge:(<span class="keyword">int</span>)age</span><br><span class="line">&#123;</span><br><span class="line">    <span class="built_in">NSLog</span>(<span class="string">@"setAge:"</span>);</span><br><span class="line">    _age = age;</span><br><span class="line">&#125;</span><br><span class="line">- (<span class="keyword">void</span>)willChangeValueForKey:(<span class="built_in">NSString</span> *)key</span><br><span class="line">&#123;</span><br><span class="line">    <span class="built_in">NSLog</span>(<span class="string">@"willChangeValueForKey: - begin"</span>);</span><br><span class="line">    [<span class="keyword">super</span> willChangeValueForKey:key];</span><br><span class="line">    <span class="built_in">NSLog</span>(<span class="string">@"willChangeValueForKey: - end"</span>);</span><br><span class="line">&#125;</span><br><span class="line">- (<span class="keyword">void</span>)didChangeValueForKey:(<span class="built_in">NSString</span> *)key</span><br><span class="line">&#123;</span><br><span class="line">    <span class="built_in">NSLog</span>(<span class="string">@"didChangeValueForKey: - begin"</span>);</span><br><span class="line">    [<span class="keyword">super</span> didChangeValueForKey:key];</span><br><span class="line">    <span class="built_in">NSLog</span>(<span class="string">@"didChangeValueForKey: - end"</span>);</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// 打印内容</span></span><br><span class="line">setAge:</span><br><span class="line">setAge:</span><br><span class="line">willChangeValueForKey: - begin</span><br><span class="line">willChangeValueForKey: - end</span><br><span class="line">setAge:</span><br><span class="line">didChangeValueForKey: - begin</span><br><span class="line">监听到&lt;Person: <span class="number">0x6000032f4260</span>&gt;的age改变了&#123;</span><br><span class="line">    kind = <span class="number">1</span>;</span><br><span class="line">    new = <span class="number">30</span>;</span><br><span class="line">    old = <span class="number">10</span>;</span><br><span class="line">&#125;</span><br><span class="line">didChangeValueForKey: - end</span><br><span class="line">setAge:</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>通过上面的打印内容，我们知道 <code>didChangeValueForKey:</code> 内部确实会调用 <code>observer</code> 的 <code>observeValueForKeyPath:ofObject:change:context:</code> 方法，验证了之前的观点。</p>
+</li>
+</ul>
+<h4 id="六、总结（KVO的本质是什么？）"><a href="#六、总结（KVO的本质是什么？）" class="headerlink" title="六、总结（KVO的本质是什么？）"></a>六、总结（KVO的本质是什么？）</h4><ul>
+<li>利用 <code>RuntimeAPI</code> 动态生成一个子类，并且让 <code>instance</code> 对象的 <code>isa</code> 指向这个全新的子类<code>（NSKVONotifying_XXX）</code></li>
+<li>当修改 <code>instance</code> 对象的属性时，会调用 <code>Foundation</code> 的 <code>_NSSetXXXValueAndNotify</code> 函数</li>
+<li>子类拥有自己的set方法实现，内部会调用<ul>
+<li>willChangeValueForKey:</li>
+<li>原来的 setter 方法</li>
+<li>didChangeValueForKey: 这个方法内部又会调用监听器(observe)的监听方法（observeValueForKeyPath:ofObject:change:context:）</li>
+</ul>
+</li>
+</ul>
+]]></content>
+      <categories>
+        <category>iOS</category>
+      </categories>
+      <tags>
+        <tag>KVO</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>浅谈二分查找</title>
+    <url>/2018/01/23/%E6%B5%85%E8%B0%88%E4%BA%8C%E5%88%86%E6%9F%A5%E6%89%BE/</url>
+    <content><![CDATA[<blockquote>
+<p>二分查找是一种算法，其输入是一个有序的元素列表（必须有序的原因稍后解释）。如果要查找的元素包含在列表中，二分查找返回其位置；否则返回null 。</p>
+</blockquote>
+<a id="more"></a>
+
+<h4 id="1-下面是一个例子："><a href="#1-下面是一个例子：" class="headerlink" title="1. 下面是一个例子："></a>1. 下面是一个例子：</h4><h6 id="我随便想一个-1～100-的数字，你的目标是以最少的次数猜到这个数字。你每次猜测后，我会说小了、大了或对了。假设你从-1-开始依次往上猜，每次猜测都只能排除一个数字。如果我想的数字是-99，你得猜-99-次才能猜到！"><a href="#我随便想一个-1～100-的数字，你的目标是以最少的次数猜到这个数字。你每次猜测后，我会说小了、大了或对了。假设你从-1-开始依次往上猜，每次猜测都只能排除一个数字。如果我想的数字是-99，你得猜-99-次才能猜到！" class="headerlink" title="我随便想一个 1～100 的数字，你的目标是以最少的次数猜到这个数字。你每次猜测后，我会说小了、大了或对了。假设你从 1 开始依次往上猜，每次猜测都只能排除一个数字。如果我想的数字是 99，你得猜 99 次才能猜到！"></a>我随便想一个 1～100 的数字，你的目标是以最少的次数猜到这个数字。你每次猜测后，我会说小了、大了或对了。假设你从 1 开始依次往上猜，每次猜测都只能排除一个数字。如果我想的数字是 99，你得猜 99 次才能猜到！</h6><h4 id="更佳的查找方式（二分查找）"><a href="#更佳的查找方式（二分查找）" class="headerlink" title="更佳的查找方式（二分查找）"></a>更佳的查找方式（二分查找）</h4><p>我们直接上代码</p>
+<figure class="highlight swift"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">binarySearch</span><span class="params">(list: [Int], item: Int)</span></span> -&gt; <span class="type">Int?</span> &#123;</span><br><span class="line">    <span class="keyword">var</span> low = <span class="number">0</span></span><br><span class="line">    <span class="keyword">var</span> high = list.<span class="built_in">count</span> - <span class="number">1</span></span><br><span class="line">    <span class="keyword">while</span> low &lt;= high &#123;</span><br><span class="line">        <span class="keyword">let</span> mid = (low + high) / <span class="number">2</span></span><br><span class="line">        <span class="keyword">let</span> guess = list[mid]</span><br><span class="line">        <span class="keyword">if</span> guess == item &#123; <span class="keyword">return</span> mid &#125;</span><br><span class="line">        <span class="keyword">if</span> guess &gt; item &#123;</span><br><span class="line">            high = mid - <span class="number">1</span></span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            low = mid + <span class="number">1</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">nil</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">let</span> myList = [<span class="number">1</span>, <span class="number">3</span>, <span class="number">5</span>, <span class="number">7</span>, <span class="number">9</span>]</span><br><span class="line"><span class="keyword">let</span> result = binarySearch(list: myList, item: <span class="number">7</span>) <span class="comment">// result is 3</span></span><br></pre></td></tr></table></figure>
+<h4 id="2-运行时间"><a href="#2-运行时间" class="headerlink" title="2. 运行时间"></a>2. 运行时间</h4><ul>
+<li>每次介绍算法时，我都将讨论其运行时间。一般而言，应选择效率最高的算法，以最大限度地减少运行时间或占用空间。回到前面的二分查找。使用它可节省多少时间呢？简单查找逐个地检查数字，如果列表包含 100 个数字，最多需要猜 100 次。如果列表包含 40 亿个数字，最多需要猜 40 亿次。换言之，最多需要猜测的次数与列表长度相同，这被称为<strong>线性时间(linear time)</strong>。  </li>
+<li>二分查找则不同。如果列表包含 100 个元素，最多要猜 7 次；如果列表包含 40 亿个数字，最多需猜 32 次。厉害吧？二分查找的运行时间为<strong>对数时间(或log时间)</strong>。</li>
+</ul>
+<h4 id="3-大O表示法"><a href="#3-大O表示法" class="headerlink" title="3. 大O表示法"></a>3. 大O表示法</h4><blockquote>
+<p>大O表示法指出了算法有多快。例如，假设列表包含 n 个元素。简单查找需要检查每个元素，因此需要执行 n 次操作。使用 <strong>大O</strong> 表示法，这个运行时间为 O (n )。单位秒呢？没有—— <strong>大O</strong> 表示法指的并非以秒为单位的速度。<br><strong>大O</strong> 表示法让你能够比较操作数，它指出了算法运行时间的增速 。</p>
+</blockquote>
+<h5 id="3-1-大O表示法让你能够比较操作数，它指出了算法运行时间的增速"><a href="#3-1-大O表示法让你能够比较操作数，它指出了算法运行时间的增速" class="headerlink" title="3.1 大O表示法让你能够比较操作数，它指出了算法运行时间的增速"></a>3.1 大O表示法让你能够比较操作数，它指出了算法运行时间的增速</h5><p>下面按从快到慢的顺序列出了你经常会遇到的 5 种 大O 运行时间。</p>
+<ul>
+<li>O (log n )，也叫对数时间 ，这样的算法包括二分查找。</li>
+<li>O (n )，也叫线性时间 ，这样的算法包括简单查找。</li>
+<li>O (n * log n )，这样的算法包括快速排序(一种速度较快的排序算法)。</li>
+<li>O (n 2 )，这样的算法包括选择排序(一种速度较慢的排序算法)。</li>
+<li>O (n !)，这样的算法包括旅行商问题的解决方案(一种非常慢的算法)</li>
+</ul>
+<h4 id="4-小结"><a href="#4-小结" class="headerlink" title="4. 小结"></a>4. 小结</h4><ul>
+<li>二分查找的速度比简单查找快得多</li>
+<li>O (log n ) 比 O (n ) 快。需要搜索的元素越多，前者比后者就快得越多。</li>
+<li>算法运行时间并不以秒为单位。</li>
+<li>算法运行时间是从其增速的角度度量的。</li>
+<li>算法运行时间用 大O 表示法表示。</li>
+</ul>
+]]></content>
+      <categories>
+        <category>算法</category>
+      </categories>
+      <tags>
+        <tag>二分查找</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>CocoaPods最简单成功安装实例</title>
+    <url>/2017/09/23/CocoaPods%E6%9C%80%E7%AE%80%E5%8D%95%E6%88%90%E5%8A%9F%E5%AE%89%E8%A3%85%E5%AE%9E%E4%BE%8B/</url>
+    <content><![CDATA[<h4 id="一、CocoaPods介绍"><a href="#一、CocoaPods介绍" class="headerlink" title="一、CocoaPods介绍"></a>一、CocoaPods介绍</h4><ul>
+<li>CocoaPods 是 iOS 开发中的第三方库管理的工具。目的是让我们能自动化的、集中的、直观的管理第三方开源库。</li>
+<li>CocoaPods 能够自动解决库与库之间的依赖关系，下载库的源代码。并创建一个 Xcode 的 workspace 来将这些第三方库和我们的工程连接起来，供我们开发使用。<a id="more"></a>
+
+</li>
+</ul>
+<h4 id="二、安装CocoaPods"><a href="#二、安装CocoaPods" class="headerlink" title="二、安装CocoaPods"></a>二、安装CocoaPods</h4><p>1、将 gem 升级为最新版本</p>
+<figure class="highlight objc"><table><tr><td class="code"><pre><span class="line">sudo gem update --system</span><br></pre></td></tr></table></figure>
+
+<p>2、因为 Ruby 的软件源 rubygems.org 被屏蔽了，所以要更换源</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">gem sources --add https:&#x2F;&#x2F;gems.ruby-china.com&#x2F; --remove https:&#x2F;&#x2F;rubygems.org&#x2F;</span><br></pre></td></tr></table></figure>
+<p>3、接着执行下面命令，确保只有 gems.ruby-china.com （确保旧版本镜像都要移除，比如原先如果有淘宝镜像也要删除。）</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">gem sources -l</span><br></pre></td></tr></table></figure>
+<p>​                       <img src="/images/CocoaPods%E6%9C%80%E7%AE%80%E5%8D%95%E6%88%90%E5%8A%9F%E5%AE%89%E8%A3%85%E5%AE%9E%E4%BE%8B/gem_source.png" alt="gem_source"></p>
+<p>4、运行如下命令安装 CocoaPods</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">sudo gem install -n &#x2F;usr&#x2F;local&#x2F;bin cocoapods</span><br></pre></td></tr></table></figure>
+<p>5、接着执行如下命令，如果没有报错，就说明一切安装成功了。（这个执行后要等上一段时间，Cocoapods 在将它的信息下载到 ~/.cocoapods 里。大概有100多兆。）</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">pod setup</span><br></pre></td></tr></table></figure>
+<p>6、下载中如果不放心，可以 command + T 新建一个终端窗口分别输入下面两条命令查看下载了多少</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">cd ~&#x2F;.cocoapods</span><br><span class="line">du -sh</span><br></pre></td></tr></table></figure>
+<p>7、安装后执行如下命令查看版本</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">pod --version</span><br></pre></td></tr></table></figure>
+<p><img src="/images/CocoaPods%E6%9C%80%E7%AE%80%E5%8D%95%E6%88%90%E5%8A%9F%E5%AE%89%E8%A3%85%E5%AE%9E%E4%BE%8B/pod_version.png" alt="pod_version"></p>
+<p>8、以后要更新升级 CocoaPods，执行如下命令</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">sudo gem update cocoapods</span><br></pre></td></tr></table></figure>
+]]></content>
+      <categories>
+        <category>iOS</category>
+      </categories>
+      <tags>
+        <tag>CacoaPods</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>iOS开发你可能用的上的开源工具</title>
     <url>/2017/08/22/iOS%E5%BC%80%E5%8F%91%E4%BD%A0%E5%8F%AF%E8%83%BD%E7%94%A8%E7%9A%84%E4%B8%8A%E7%9A%84%E5%BC%80%E6%BA%90%E5%B7%A5%E5%85%B7/</url>
     <content><![CDATA[<ul>
@@ -601,9 +1060,9 @@
         <category>iOS</category>
       </categories>
       <tags>
-        <tag>Objective-C</tag>
         <tag>开源工具</tag>
         <tag>Swift</tag>
+        <tag>Objective-C</tag>
       </tags>
   </entry>
 </search>
