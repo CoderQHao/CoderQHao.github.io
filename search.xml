@@ -414,6 +414,130 @@
       </tags>
   </entry>
   <entry>
+    <title>对RunLoop的一些看法</title>
+    <url>/2018/04/12/%E5%AF%B9RunLoop%E7%9A%84%E4%B8%80%E4%BA%9B%E7%9C%8B%E6%B3%95/</url>
+    <content><![CDATA[<h3 id="RunLoop介绍"><a href="#RunLoop介绍" class="headerlink" title="RunLoop介绍"></a>RunLoop介绍</h3><p>运行循环，在程序运行过程中循环做一些事情，如果没有 Runloop 程序执行完毕就会立即退出，如果有Runloop程序会一直运行，并且时时刻刻在等待用户的输入操作。RunLoop 可以在需要的时候自己跑起来运行，在没有操作的时候就停下来休息。充分节省CPU资源，提高程序性能。</p>
+<a id="more"></a>
+
+<h4 id="1、RunLoop的基本作用"><a href="#1、RunLoop的基本作用" class="headerlink" title="1、RunLoop的基本作用"></a>1、RunLoop的基本作用</h4><ul>
+<li>保持程序的持续运行</li>
+<li>处理App中的各种事件（比如触摸事件、定时器事件等）</li>
+<li>节省CPU资源，提高程序性能：该做事时做事，该休息时休息</li>
+</ul>
+<hr>
+<h4 id="2、RunLoop对象"><a href="#2、RunLoop对象" class="headerlink" title="2、RunLoop对象"></a>2、RunLoop对象</h4><ul>
+<li><p>iOS中有2套API来访问和使用 RunLoop</p>
+</li>
+<li><p>Foundation：NSRunLoop</p>
+</li>
+<li><p>Core Foundation：CFRunLoopRef</p>
+</li>
+<li><p>NSRunLoop 和 CFRunLoopRef 都代表着 RunLoop 对象</p>
+</li>
+<li><p>NSRunLoop 是基于 CFRunLoopRef 的一层 OC 包装</p>
+</li>
+<li><p><a href="https://opensource.apple.com/tarballs/CF/" target="_blank" rel="noopener">CFRunLoopRef</a>是开源的</p>
+</li>
+</ul>
+<hr>
+<h4 id="3、RunLoop与线程"><a href="#3、RunLoop与线程" class="headerlink" title="3、RunLoop与线程"></a>3、RunLoop与线程</h4><ul>
+<li>每条线程都有唯一的一个与之对应的 RunLoop 对象</li>
+<li>RunLoop 保存在一个全局的 Dictionary 里，线程作为 key，RunLoop作为 value</li>
+<li>线程刚创建时并没有 RunLoop 对象，RunLoop 会在第一次获取它时创建</li>
+<li>RunLoop 会在线程结束时销毁</li>
+<li>主线程的 RunLoop 已经自动获取（创建），子线程默认没有开启 RunLoop</li>
+</ul>
+<hr>
+<h4 id="4、获取RunLoop对象"><a href="#4、获取RunLoop对象" class="headerlink" title="4、获取RunLoop对象"></a>4、获取RunLoop对象</h4><figure class="highlight objc"><table><tr><td class="code"><pre><span class="line"><span class="comment">// Foundation</span></span><br><span class="line"><span class="comment">// 获得当前线程的 RunLoop 对象</span></span><br><span class="line">[<span class="built_in">NSRunLoop</span> currentRunLoop]; </span><br><span class="line"><span class="comment">// 获得主线程的 RunLoop 对象</span></span><br><span class="line">[<span class="built_in">NSRunLoop</span> mainRunLoop]; </span><br><span class="line"></span><br><span class="line"><span class="comment">// Core Foundation</span></span><br><span class="line"><span class="comment">// 获得当前线程的 RunLoop 对象 </span></span><br><span class="line"><span class="built_in">CFRunLoopGetCurrent</span>(); </span><br><span class="line"><span class="comment">// 获得主线程的 RunLoop 对象</span></span><br><span class="line"><span class="built_in">CFRunLoopGetMain</span>();</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h4 id="5、RunLoop相关的类"><a href="#5、RunLoop相关的类" class="headerlink" title="5、RunLoop相关的类"></a>5、RunLoop相关的类</h4><p>Core Foundation 中关于 RunLoop 的5个类</p>
+<ul>
+<li>CFRunLoopRef</li>
+</ul>
+<figure class="highlight objc"><table><tr><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="keyword">struct</span> __CFRunLoop * <span class="built_in">CFRunLoopRef</span></span><br><span class="line"><span class="keyword">struct</span> __CFRunLoop &#123;</span><br><span class="line">    pthread_t _pthread;</span><br><span class="line">    <span class="built_in">CFMutableSetRef</span> _commonModes;</span><br><span class="line">    <span class="built_in">CFMutableSetRef</span> _commonModeItems;</span><br><span class="line">    <span class="built_in">CFRunLoopModeRef</span> _currentMode;</span><br><span class="line">    <span class="built_in">CFMutableSetRef</span> _modes;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>CFRunLoopModeRef</li>
+</ul>
+<figure class="highlight objc"><table><tr><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="keyword">struct</span> __CFRunLoopMode * <span class="built_in">CFRunLoopModeRef</span></span><br><span class="line"><span class="keyword">struct</span> __CFRunLoopMode &#123;</span><br><span class="line">    <span class="built_in">CFStringRef</span> _name;</span><br><span class="line">    <span class="built_in">CFMutableSetRef</span> _sources0;</span><br><span class="line">    <span class="built_in">CFMutableSetRef</span> _sources1;</span><br><span class="line">    <span class="built_in">CFMutableArrayRef</span> _observers;</span><br><span class="line">    <span class="built_in">CFMutableArrayRef</span> _timers;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>CFRunLoopSourceRef</li>
+<li>CFRunLoopTimerRef</li>
+<li>CFRunLoopObserverRef</li>
+</ul>
+<p><img src="../images/%E5%AF%B9RunLoop%E7%9A%84%E4%B8%80%E4%BA%9B%E7%9C%8B%E6%B3%95/RunLoop.png" alt="RunLoop"></p>
+<hr>
+<h4 id="6、CFRunLoopModeRef"><a href="#6、CFRunLoopModeRef" class="headerlink" title="6、CFRunLoopModeRef"></a>6、CFRunLoopModeRef</h4><ul>
+<li><p>CFRunLoopModeRef 代表 RunLoop 的运行模式</p>
+</li>
+<li><p>一个 RunLoop 包含若干个 Mode，每个Mode又包含若干个 Source0/Source1/Timer/Observer</p>
+</li>
+<li><p>RunLoop 启动时只能选择其中一个 Mode，作为 currentMode</p>
+</li>
+<li><p>如果需要切换 Mode，只能退出当前 Loop，再重新选择一个 Mode 进入</p>
+</li>
+<li><p>不同组的 Source0/Source1/Timer/Observer 能分隔开来，互不影响</p>
+</li>
+<li><p>如果 Mode 里没有任何 Source0/Source1/Timer/Observer，RunLoop 会立马退出</p>
+</li>
+<li><p>系统默认注册了5个 Mode</p>
+</li>
+<li><p>kCFRunLoopDefaultMode（NSDefaultRunLoopMode）：App 的默认 Mode，通常主线程是在这个 Mode 下运行的</p>
+</li>
+<li><p>UITrackingRunLoopMode：界面跟踪 Mode，用于 ScrollView 追踪触摸滑动，保证界面滑动时不受其他 Mode 影响</p>
+</li>
+<li><p>UIInitializationRunLoopMode: 在刚启动 App 时第进入的第一个 Mode，启动完成后就不再使用</p>
+</li>
+<li><p>GSEventReceiveRunLoopMode: 接受系统事件的内部 Mode，通常用不到</p>
+</li>
+<li><p>kCFRunLoopCommonModes: 这是一个占位的 Mode，没有实际作用</p>
+</li>
+</ul>
+<hr>
+<h4 id="7、RunLoop的运行逻辑"><a href="#7、RunLoop的运行逻辑" class="headerlink" title="7、RunLoop的运行逻辑"></a>7、RunLoop的运行逻辑</h4><ul>
+<li><p>Source0</p>
+<ul>
+<li>触摸事件处理</li>
+<li>performSelector:onThread:</li>
+</ul>
+</li>
+<li><p>Source1</p>
+<ul>
+<li>基于 Port 的线程间通信</li>
+<li>系统事件捕捉</li>
+</ul>
+</li>
+<li><p>Timers</p>
+<ul>
+<li>NSTimer</li>
+<li>performSelector:withObject:afterDelay:</li>
+</ul>
+</li>
+<li><p>Observers</p>
+<ul>
+<li>用于监听 RunLoop 的状态</li>
+<li>UI刷新（BeforeWaiting）</li>
+<li>Autorelease pool（BeforeWaiting）</li>
+</ul>
+</li>
+</ul>
+<h2 id=""><a href="#" class="headerlink" title=""></a><img src="../images/%E5%AF%B9RunLoop%E7%9A%84%E4%B8%80%E4%BA%9B%E7%9C%8B%E6%B3%95/RunLoop_Logic.png" alt="RunLoop_Logic"></h2><h4 id="7、RunLoop在实际开中的应用"><a href="#7、RunLoop在实际开中的应用" class="headerlink" title="7、RunLoop在实际开中的应用"></a>7、RunLoop在实际开中的应用</h4><ul>
+<li>控制线程生命周期（线程保活）</li>
+<li>解决NSTimer在滑动时停止工作的问题</li>
+<li>监控应用卡顿</li>
+<li>性能优化</li>
+</ul>
+]]></content>
+      <categories>
+        <category>iOS</category>
+      </categories>
+      <tags>
+        <tag>RunLoop</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>金额字符串格式化</title>
     <url>/2018/03/25/%E9%87%91%E9%A2%9D%E5%AD%97%E7%AC%A6%E4%B8%B2%E6%A0%BC%E5%BC%8F%E5%8C%96/</url>
     <content><![CDATA[<blockquote>
